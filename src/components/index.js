@@ -1,0 +1,13 @@
+export { default as Cart } from "./Cart";
+export { default as CategoryNav } from "./CategoryNav";
+export { default as DealsSection } from "./DealsSection";
+export { default as Footer } from "./Footer";
+export { default as Header } from "./Header";
+export { default as HowToFind } from "./HowToFind";
+export { default as Menu } from "./Menu";
+export { default as ProductsSection } from "./ProductsSection";
+export { default as Reviews } from "./Reviews";
+export { default as WhyUs } from "./WhyUs";
+export { default as YandexMap } from "./YandexMap";
+export { default as Marquee} from "./Marquee.js";
+export { default as DriveImage} from "./DriveImage.js";
