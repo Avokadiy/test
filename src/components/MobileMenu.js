@@ -14,7 +14,7 @@ const MobileMenu = () => {
         router.push('/cart')
     }
 
-    const [isOpen, setIsOpen] = useState(true)
+    const [isOpen, setIsOpen] = useState(false)
 
     return (
         <>
