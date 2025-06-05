@@ -9,16 +9,20 @@ const Reviews = () => {
             <div className="w-1/3">
               <Image
                 src="/images/bouquet.jpg"
+                width={300}
+                height={300}
                 alt="Отзыв 1"
-                className="rounded-full w-24 h-24 mx-auto"
+                className="rounded-full mx-auto"
               />
               <p className="mt-4">&quot;Прекрасный вкус, доставка вовремя!&quot;</p>
             </div>
             <div className="w-1/3">
-              <Image
+            <Image
                 src="/images/bouquet.jpg"
+                width={300}
+                height={300}
                 alt="Отзыв 2"
-                className="rounded-full w-24 h-24 mx-auto"
+                className="rounded-full mx-auto"
               />
               <p className="mt-4">&quot;Супер сервис, всегда свежие продукты!&quot;</p>
             </div>

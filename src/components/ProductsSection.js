@@ -17,16 +17,6 @@ const ProductsSection = ({ id, title, category }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState('');
 
-  // Вызов useMemo до всего кода компонента, чтобы избежать изменений порядка
-  const sliderSettings = useMemo(() => ({
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    arrows: true,
-  }), []);
-
   const openModal = useCallback((product) => {
     setSelectedProduct(product);
     setSelectedOption('');
@@ -40,21 +30,21 @@ const ProductsSection = ({ id, title, category }) => {
     setIsModalOpen(false);
   }, []);
 
-  const handleOptionChange = (option) => {
-    setSelectedOption(option);
-    const basePrice = selectedProduct.price;
-    if (selectedProduct.options?.size?.length) {
-      const i = selectedProduct.options.size.indexOf(option);
-      if (i !== -1) {
-        setFinalPrice(basePrice + i * 600);
-      }
-    } else if (selectedProduct.options?.quantity?.length) {
-      const i = selectedProduct.options.quantity.indexOf(Number(option));
-      if (i !== -1) {
-        setFinalPrice(basePrice + i * 600);
-      }
-    }
-  };
+  // const handleOptionChange = (option) => {
+  //   setSelectedOption(option);
+  //   const basePrice = selectedProduct.price;
+  //   if (selectedProduct.options?.size?.length) {
+  //     const i = selectedProduct.options.size.indexOf(option);
+  //     if (i !== -1) {
+  //       setFinalPrice(basePrice + i * 600);
+  //     }
+  //   } else if (selectedProduct.options?.quantity?.length) {
+  //     const i = selectedProduct.options.quantity.indexOf(Number(option));
+  //     if (i !== -1) {
+  //       setFinalPrice(basePrice + i * 600);
+  //     }
+  //   }
+  // };
 
   const handleAddToCart = () => {
     if (!selectedOption) {
@@ -139,10 +129,17 @@ const ProductsSection = ({ id, title, category }) => {
             <div className="mb-4">
               <ProductSlider images={selectedProduct.images} productName={selectedProduct.productName}/>
             </div>
-            <div>
-              {selectedProduct.size?.map((option, index) => (
-                <div key={index}>
-                  <p>{option}</p>
+            <div className='flex'>
+              {selectedProduct.options.size?.map((option, index) => (
+                <div
+                  key={index}
+                >
+                  <button
+                    onClick={() => {setSelectedOption(option)}}
+                    className={`${selectedOption === option ? 'bg-gray-300' : ''} rounded-2xl p-2 hover:bg-gray-100 transition-colors`}
+                  >
+                    {option}
+                  </button>
                 </div>
               ))}
             </div>

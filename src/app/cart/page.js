@@ -131,9 +131,10 @@ const CartPage = () => {
                     height={500}
                     className="object-cover mx-auto rounded-md"
                   />
-                  <div>
+                  <div className='ml-5'>
                     <p className="font-semibold">{product.name}</p>
                     <p className="text-sm">{product.price}</p>
+                    <p className="text-sm">{product.selectedOption}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">

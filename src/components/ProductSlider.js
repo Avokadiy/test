@@ -60,45 +60,6 @@ const ProductSlider = ({ images, productName }) => {
       </Swiper>
 
     </div>
-
-    // <Slider {...{
-    //   dots: true,
-    //   infinite: true,
-    //   speed: 500,
-    //   slidesToShow: 1,
-    //   slidesToScroll: 1,
-    //   arrows: true,
-    //   responsive: [
-    //     {
-    //       breakpoint: 1024,
-    //       settings: {
-    //         slidesToShow: 3,
-    //         slidesToScroll: 3,
-    //       }
-    //     },
-    //     {
-    //       breakpoint: 768,
-    //       settings: {
-    //         slidesToShow: 1,
-    //         slidesToScroll: 1,
-    //       }
-    //     }
-    //   ]
-    // }}>
-    //   {images.map((img, index) => (
-    //     <div key={index}>
-    //       <Image
-    //         src={img}
-    //         alt={productName}
-    //         layout="intrinsic"
-    //         width={400}
-    //         height={500}
-    //         className="object-cover rounded-md cursor-pointer"
-    //         loading="lazy"
-    //       />
-    //     </div>
-    //   ))}
-    // </Slider>
   );
 };
 
