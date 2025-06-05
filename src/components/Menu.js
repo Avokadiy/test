@@ -5,12 +5,14 @@ import MobileMenu from './MobileMenu'
 import DesktopMenu from './DesktopMenu'
 
 const Menu = () => {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const updateSize = () => {
       setIsMobile(window.innerWidth < 768);
     }
+
+    updateSize();
 
     window.addEventListener('resize', updateSize);
     return () => window.removeEventListener('resize', updateSize);
@@ -19,8 +21,6 @@ const Menu = () => {
   return (
     <>
       {isMobile ? <MobileMenu /> : <DesktopMenu />}
-      {/* Отступ для контента, чтобы он не перекрывался меню */}
-
     </>
   )
 }
