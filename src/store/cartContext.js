@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useReducer, useEffect, useCallback, useRef } from 'react';
+import { createContext, useContext, useReducer, useEffect, useCallback, useRef, useState } from 'react';
 import { toast } from 'react-hot-toast';
 
 const CartContext = createContext();
@@ -30,7 +30,7 @@ const cartReducer = (state, action) => {
     case 'REMOVE_FROM_CART':
       return state.filter(item => item.id !== action.id || item.selectedOption !== action.option);
     case 'INCREMENT_QUANTITY':
-      return state.map(item => {
+      return state.map(item => {        
         if (item.id === action.id && item.selectedOption === action.option) {
           if (item.quantity >= MAX_QUANTITY) {
             return item; // Уведомление отдельно
@@ -56,21 +56,43 @@ export const CartProvider = ({ children }) => {
   const [cart, dispatch] = useReducer(cartReducer, []);
   const hasShownLimitToast = useRef(false); // уведомление только один раз
   const timerRef = useRef(null); // Ссылка для таймера
+  const prevCartRef = useRef([]);
 
+  // Инициализация корзины
   useEffect(() => {
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
-      dispatch({ type: 'INIT_CART', payload: JSON.parse(savedCart) });
+      try {
+        const parsedCart = JSON.parse(savedCart);
+        dispatch({ type: 'INIT_CART', payload: parsedCart });
+        prevCartRef.current = parsedCart;
+      } catch (e) {
+        localStorage.removeItem('cart');
+      }
     }
   }, []);
 
+  // Сохранение корзины
   useEffect(() => {
-    if (cart.length > 0) {
-      localStorage.setItem('cart', JSON.stringify(cart));
-    } else {
-      localStorage.removeItem('cart');
+    // Проверяем, действительно ли изменилась корзина
+    if (JSON.stringify(prevCartRef.current) !== JSON.stringify(cart)) {
+      if (cart.length > 0) {
+        localStorage.setItem('cart', JSON.stringify(cart));
+      } else {
+        localStorage.removeItem('cart');
+      }
+      prevCartRef.current = cart;
     }
   }, [cart]);
+
+  // Очистка таймера при размонтировании
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, []);
 
   const addToCart = useCallback((product) => {
     const existingProduct = cart.find(

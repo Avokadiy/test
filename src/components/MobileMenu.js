@@ -36,7 +36,7 @@ const MobileMenu = () => {
                         />
                     </button>
                     <div className={`${isOpen ? 'flex' : 'hidden'}`}>
-                        <ul className='flex flex-col absolute top-13 left-0 rounded-b-md w-full gap-6 bg-white text-black font-semibold'>
+                        <ul className='flex flex-col absolute top-12 left-0 rounded-b-md w-full gap-6 bg-white text-black font-semibold'>
                             {[
                                 { name: 'Клубника в шоколаде', path: '/strawberry' },
                                 { name: 'Цветы', path: '/flowers' },

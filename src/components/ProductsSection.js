@@ -5,7 +5,6 @@ import { useCart } from '../store/cartContext';
 import { useSheetProducts } from '../hooks/useSheetProducts';
 import Image from 'next/image';
 import ProductSlider from './ProductSlider';  // Импортируем компонент ProductSlider
-import { Swiper, SwiperSlide } from "swiper/react";
 
 const ProductsSection = ({ id, title, category }) => {
   const { addToCart } = useCart();
@@ -20,7 +19,7 @@ const ProductsSection = ({ id, title, category }) => {
   const openModal = useCallback((product) => {
     setSelectedProduct(product);
     setSelectedOption('');
-    setFinalPrice(product.price);
+    setFinalPrice(finalPrice);
     setIsModalOpen(true);
     setSelectedImage(product.image); // Сначала показываем основное изображение
   }, []);
@@ -29,22 +28,6 @@ const ProductsSection = ({ id, title, category }) => {
     setSelectedProduct(null);
     setIsModalOpen(false);
   }, []);
-
-  // const handleOptionChange = (option) => {
-  //   setSelectedOption(option);
-  //   const basePrice = selectedProduct.price;
-  //   if (selectedProduct.options?.size?.length) {
-  //     const i = selectedProduct.options.size.indexOf(option);
-  //     if (i !== -1) {
-  //       setFinalPrice(basePrice + i * 600);
-  //     }
-  //   } else if (selectedProduct.options?.quantity?.length) {
-  //     const i = selectedProduct.options.quantity.indexOf(Number(option));
-  //     if (i !== -1) {
-  //       setFinalPrice(basePrice + i * 600);
-  //     }
-  //   }
-  // };
 
   const handleAddToCart = () => {
     if (!selectedOption) {
@@ -95,7 +78,7 @@ const ProductsSection = ({ id, title, category }) => {
                 </div>
                 <h3 className="mt-2 text-lg font-semibold">{product.name}</h3>
                 <p className="text-sm text-gray-500">{product.description || 'Без описания'}</p>
-                <p className="text-red-500 font-bold">{product.price} ₽</p>
+                <p className="text-red-500 font-bold">{product.price[1]} ₽</p>
                 <button
                   className="mt-2 bg-[#F1ADAE] text-white px-4 py-2 rounded-md shadow-md hover:bg-[#ec9898] transition"
                   onClick={() => openModal(product)}
@@ -135,7 +118,10 @@ const ProductsSection = ({ id, title, category }) => {
                   key={index}
                 >
                   <button
-                    onClick={() => {setSelectedOption(option)}}
+                    onClick={() => {
+                      setSelectedOption(option)
+                      setFinalPrice(selectedProduct.price[index])
+                    }}
                     className={`${selectedOption === option ? 'bg-gray-300' : ''} rounded-2xl p-2 hover:bg-gray-100 transition-colors`}
                   >
                     {option}

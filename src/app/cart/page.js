@@ -34,7 +34,6 @@ const orderSchema = z.object({
 
 const CartPage = () => {
   const { cart, removeFromCart, clearCart, increaseQuantity, decreaseQuantity } = useCart();
-  const [storedCart, setStoredCart] = useState(cart);
   const [orderConfirmed, setOrderConfirmed] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -59,23 +58,14 @@ const CartPage = () => {
     setValue('deliveryTime', selectedTime);
   }, [selectedTime, setValue]);
 
-  const total = storedCart.reduce(
+  // Используем cart из контекста вместо локального состояния
+  const total = cart.reduce(
     (sum, product) =>
       sum +
       parseFloat(String(product.price).replace(' ₽', '').replace(' ', '')) *
         (product.quantity || 1),
     0
   );
-
-  const handleRemove = (productId, option) => {
-    const updatedCart = storedCart.filter((product) => product.id !== productId || product.selectedOption !== option);
-    setStoredCart(updatedCart);
-  };
-
-  const handleClearCart = () => {
-    setStoredCart([]);
-    localStorage.removeItem('cart');
-  };
 
   const closeModal = () => setIsModalOpen(false);
 
@@ -93,21 +83,10 @@ const CartPage = () => {
     reset();
   };
 
-  useEffect(() => {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-      setStoredCart(JSON.parse(savedCart));
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(storedCart));
-  }, [storedCart]);
-
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-bold mb-6">Корзина</h1>
-      {storedCart.length === 0 ? (
+      {cart.length === 0 ? (
         <p>
           Корзина пуста.{' '}
           <Link href="/" className="text-blue-500">
@@ -117,7 +96,7 @@ const CartPage = () => {
       ) : (
         <div>
           <ul>
-            {storedCart.map((product, index) => (
+            {cart.map((product, index) => (
               <li
                 key={`${product.id}-${product.selectedOption}-${index}`}
                 className="flex justify-between items-center py-4 border-b"
@@ -126,9 +105,8 @@ const CartPage = () => {
                   <Image
                     src={product.image}
                     alt={product.name}
-                    layout="responsive"
-                    width={500}
-                    height={500}
+                    width={150}
+                    height={250}
                     className="object-cover mx-auto rounded-md"
                   />
                   <div className='ml-5'>
@@ -152,7 +130,7 @@ const CartPage = () => {
                     +
                   </button>
                   <button
-                    onClick={() => handleRemove(product.id, product.selectedOption)}
+                    onClick={() => removeFromCart(product.id, product.selectedOption)}
                     className="text-red-500 ml-4"
                   >
                     Удалить
@@ -165,7 +143,7 @@ const CartPage = () => {
           <div className="mt-6 flex justify-between items-center">
             <p className="font-semibold">Итоговая сумма: {total} ₽</p>
             <button
-              onClick={handleClearCart}
+              onClick={clearCart}
               className="bg-red-500 text-white py-2 px-4 rounded-md"
             >
               Очистить корзину
@@ -183,7 +161,6 @@ const CartPage = () => {
         </div>
       )}
 
-      {/* Модальное окно */}
       {isModalOpen && (
         <div
           className="fixed inset-0 flex items-center justify-center z-50"
@@ -198,10 +175,11 @@ const CartPage = () => {
               ×
             </button>
             <h2 className="text-2xl font-bold mb-6">Оформление заказа</h2>
-            <form onSubmit={handleSubmit(handleOrder)} className="space-y-4">
+            <form onSubmit={handleOrder(handleOrder)} className="space-y-4">
               <div>
                 <label>Имя отправителя</label>
                 <input
+                  value='test' //TODO_DELETE
                   {...register('senderName')}
                   placeholder="Имя отправителя"
                   className="w-full p-2 border rounded-md"
@@ -214,6 +192,7 @@ const CartPage = () => {
               <div>
                 <label>E-mail отправителя</label>
                 <input
+                  value='ahsdf@mail.ru' //TODO_DELETE
                   {...register('senderEmail')}
                   placeholder="E-mail"
                   className="w-full p-2 border rounded-md"
@@ -226,6 +205,7 @@ const CartPage = () => {
               <div>
                 <label>Телефон отправителя</label>
                 <input
+                  value='+78273648265' //TODO_DELETE
                   {...register('senderPhone')}
                   placeholder="Телефон отправителя"
                   className="w-full p-2 border rounded-md"
@@ -242,6 +222,7 @@ const CartPage = () => {
                   onChange={(date) => setSelectedDate(date)}
                   dateFormat="dd/MM/yyyy"
                   className="w-full p-2 border rounded-md"
+                  minDate={Date.now()}
                 />
               </div>
 

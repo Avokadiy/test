@@ -36,7 +36,7 @@ export async function GET(request) {
     const products = rawData.map((product, index) => ({
       id: product.id || `auto-${index}`,
       name: product.name,
-      price: Number(product.price || 0),
+      price: product.price.split(',').map(q => Number(q.trim())),
       image: product.image.trim(),
       category: product.category || '',
       description: product.description || '',
