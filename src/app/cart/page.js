@@ -19,10 +19,7 @@ const orderSchema = z.object({
   deliveryDate: z.string().min(1, 'Выберите дату доставки'),
   deliveryTime: z.string().min(1, 'Выберите время доставки'),
   deliveryMethod: z.string().optional(),
-  recipientName: z.string().min(1, 'Имя получателя обязательно'),
-  recipientPhone: z
-    .string()
-    .min(10, 'Телефон получателя должен содержать не менее 10 символов'),
+
   recipientAddress: z.string().optional(),
   comment: z.string().optional(),
   promoCode: z.string().optional(),
@@ -39,6 +36,7 @@ const CartPage = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState('');
   const [isChecked, setIsChecked] = useState(false);
+  const [isSending, setIsSending] = useState(false);
 
   const {
     register,
@@ -57,6 +55,10 @@ const CartPage = () => {
   useEffect(() => {
     setValue('deliveryTime', selectedTime);
   }, [selectedTime, setValue]);
+
+  useEffect(() => {
+    console.log('Ошибки формы:', errors);
+  }, [errors]);
 
   // Используем cart из контекста вместо локального состояния
   const total = cart.reduce(
@@ -77,11 +79,89 @@ const CartPage = () => {
 
   const handleOrder = (data) => {
     console.log('ORDER DATA:', data);
+    sendData(data); // Отправляем данные в Telegram
     setOrderConfirmed(true);
     setIsModalOpen(false);
     clearCart();
     reset();
   };
+
+  const handleSubmitOrder = handleSubmit(async (data) => {
+  console.log('Начало обработки формы'); // Добавьте этот лог
+  if (cart.length === 0) {
+    alert('Корзина пуста');
+    return;
+  }
+
+  setIsSending(true);
+  try {
+    console.log('Данные формы перед отправкой:', data);
+    await sendData(data);
+    console.log('Данные успешно отправлены');
+    
+    setOrderConfirmed(true);
+    setIsModalOpen(false);
+    clearCart();
+    reset();
+    alert('Заказ успешно оформлен!');
+  } catch (error) {
+    console.error('Ошибка оформления:', error);
+    alert('Ошибка: ' + error.message);
+  } finally {
+    setIsSending(false);
+  }
+});
+
+  async function sendData(formData) {
+  try {
+    // Формируем сообщение для Telegram
+    let message = `<b>📦 Новый заказ!</b>\n\n`;
+    
+    // Добавляем данные формы
+    message += `<b>👤 Отправитель:</b>\n`;
+    message += `- Имя: ${formData.senderName}\n`;
+    message += `- Email: ${formData.senderEmail}\n`;
+    message += `- Телефон: ${formData.senderPhone}\n\n`;
+    
+    message += `<b>📅 Доставка:</b>\n`;
+    message += `- Дата: ${formData.deliveryDate}\n`;
+    message += `- Время: ${formData.deliveryTime}\n\n`;
+    
+    // Добавляем содержимое корзины
+    message += `<b>🛒 Товары:</b>\n`;
+    cart.forEach((item, index) => {
+      message += `${index + 1}. ${item.name} (${item.selectedOption}) - ${item.quantity} × ${item.price}\n`;
+    });
+    
+    message += `\n<b>💰 Итого: ${total} ₽</b>`;
+
+    // Отправляем запрос к Telegram API
+    const response = await fetch(`https://api.telegram.org/bot7969947917:AAGPqZxT7FxAmbR4HA8ntRVPTh0seL51law/sendMessage`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        chat_id: '581497267',
+        text: message,
+        parse_mode: 'HTML'
+      })
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok) {
+      console.error('Ошибка Telegram API:', data);
+      throw new Error('Ошибка отправки сообщения');
+    }
+
+    console.log('Сообщение успешно отправлено:', data);
+    return true;
+  } catch (error) {
+    console.error('Ошибка при отправке данных:', error);
+    return false;
+  }
+}
 
   return (
     <div className="container mx-auto p-6">
@@ -175,11 +255,10 @@ const CartPage = () => {
               ×
             </button>
             <h2 className="text-2xl font-bold mb-6">Оформление заказа</h2>
-            <form onSubmit={handleOrder(handleOrder)} className="space-y-4">
+            <form onSubmit={handleSubmitOrder} className="space-y-4">
               <div>
                 <label>Имя отправителя</label>
                 <input
-                  value='test' //TODO_DELETE
                   {...register('senderName')}
                   placeholder="Имя отправителя"
                   className="w-full p-2 border rounded-md"
@@ -192,7 +271,6 @@ const CartPage = () => {
               <div>
                 <label>E-mail отправителя</label>
                 <input
-                  value='ahsdf@mail.ru' //TODO_DELETE
                   {...register('senderEmail')}
                   placeholder="E-mail"
                   className="w-full p-2 border rounded-md"
@@ -205,7 +283,6 @@ const CartPage = () => {
               <div>
                 <label>Телефон отправителя</label>
                 <input
-                  value='+78273648265' //TODO_DELETE
                   {...register('senderPhone')}
                   placeholder="Телефон отправителя"
                   className="w-full p-2 border rounded-md"
@@ -257,10 +334,10 @@ const CartPage = () => {
 
               <button
                 type="submit"
-                className="bg-green-500 text-white py-2 px-4 rounded-md mt-4"
-                disabled={!isChecked}
+                className="bg-green-500 text-white py-2 px-4 rounded-md mt-4 disabled:opacity-50"
+                disabled={!isChecked || isSending}
               >
-                Подтвердить заказ
+                {isSending ? 'Отправка...' : 'Подтвердить заказ'}
               </button>
             </form>
           </div>

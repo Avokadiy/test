@@ -33,7 +33,7 @@ const ProductSlider = ({ images, productName }) => {
           >
               <Image
                 src={img}
-                alt={productName}
+                alt='bouquet'
                 layout='intrinsic'
                 width={400}
                 height={500}
